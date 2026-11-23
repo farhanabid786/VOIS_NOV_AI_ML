@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './style.css'
 
-const API = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
+const API = (import.meta.env.VITE_API_BASE_URL || 'https://vois-nov-ai-ml.onrender.com').replace(/\/$/, '')
 const initial = {
   age: 50, education: 2, sex: 'F', cigsPerDay: 0, BPMeds: 0,
   prevalentStroke: 0, prevalentHyp: 0, diabetes: 0, totChol: 220,
