@@ -1,0 +1,52 @@
+{
+  "dataset_rows": 3390,
+  "dataset_columns": 17,
+  "train_rows_before_smote": 2712,
+  "test_rows": 678,
+  "positive_class_prevalence": 0.15073746312684366,
+  "accuracy": 0.8067846607669616,
+  "precision": 0.2835820895522388,
+  "recall": 0.18627450980392157,
+  "f1": 0.22485207100591717,
+  "roc_auc": 0.6621646922657952,
+  "confusion_matrix": [
+    [
+      528,
+      48
+    ],
+    [
+      83,
+      19
+    ]
+  ],
+  "classification_report": {
+    "0": {
+      "precision": 0.8641571194762684,
+      "recall": 0.9166666666666666,
+      "f1-score": 0.8896377422072451,
+      "support": 576.0
+    },
+    "1": {
+      "precision": 0.2835820895522388,
+      "recall": 0.18627450980392157,
+      "f1-score": 0.22485207100591717,
+      "support": 102.0
+    },
+    "accuracy": 0.8067846607669616,
+    "macro avg": {
+      "precision": 0.5738696045142536,
+      "recall": 0.5514705882352942,
+      "f1-score": 0.5572449066065811,
+      "support": 678.0
+    },
+    "weighted avg": {
+      "precision": 0.7768139733815028,
+      "recall": 0.8067846607669616,
+      "f1-score": 0.7896257385751869,
+      "support": 678.0
+    }
+  },
+  "evaluation": "Stratified 80/20 holdout; imputation, transformations, scaling and SMOTE fitted using training data only.",
+  "model": "RandomForestClassifier",
+  "random_state": 10
+}

@@ -1,0 +1,9 @@
+# Python 3.10.x
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+numpy==1.26.4
+pandas==2.2.3
+scikit-learn==1.5.2
+imbalanced-learn==0.13.0
+joblib==1.4.2
