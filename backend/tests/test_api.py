@@ -25,3 +25,15 @@ def test_prediction_contract():
     assert body["prediction"] in (0, 1)
     assert 0 <= body["probability_class_1"] <= 1
     assert 0 <= body["probability_class_0"] <= 1
+
+def test_vercel_origin_is_allowed():
+    response = client.options(
+        "/predict",
+        headers={
+            "Origin": "https://vois-nov-ai-ml.vercel.app",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "https://vois-nov-ai-ml.vercel.app"

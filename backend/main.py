@@ -26,11 +26,14 @@ app = FastAPI(
 )
 
 origins = [x.strip() for x in os.getenv(
-    "FRONTEND_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    "FRONTEND_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "https://vois-nov-ai-ml.vercel.app",
 ).split(",") if x.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://vois-nov-ai-ml(-[a-z0-9-]+)?\.vercel\.app",
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
