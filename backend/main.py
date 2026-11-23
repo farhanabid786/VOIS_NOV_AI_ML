@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 import os
+import pickle
 from pathlib import Path
 from typing import Literal
-import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, ConfigDict
 
-from model_pipeline import RAW_FEATURES
+from model_pipeline import RAW_FEATURES, NotebookPklPreprocessor
 
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "models" / "random_forest_pipeline.joblib"
-MODEL_VERSION = "vois-cardio-rf-1.0.0"
+MODEL_PATH = BASE_DIR / "models" / "Cardiovascular_Risk_Prediction_Classification.pkl"
+MODEL_VERSION = "vois-cardio-xgb-notebook-pkl-1.0.0"
 DISCLAIMER = (
     "Educational demonstration only. This output is not a medical diagnosis, "
     "not a calibrated clinical probability, and must not guide treatment."
@@ -22,7 +22,7 @@ DISCLAIMER = (
 app = FastAPI(
     title="VOIS Cardiovascular Risk Prediction API",
     version=MODEL_VERSION,
-    description="Academic Random Forest classification demonstration for TenYearCHD.",
+    description="Academic XGBoost classification demonstration for TenYearCHD.",
 )
 
 origins = [x.strip() for x in os.getenv(
@@ -37,8 +37,11 @@ app.add_middleware(
 )
 
 model = None
+pkl_preprocessor = None
 if MODEL_PATH.exists():
-    model = joblib.load(MODEL_PATH)
+    with MODEL_PATH.open("rb") as model_file:
+        model = pickle.load(model_file)
+    pkl_preprocessor = NotebookPklPreprocessor(BASE_DIR.parent / "data_cardiovascular_risk.csv")
 
 class PredictionInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -62,7 +65,7 @@ def root():
     return {
         "service": "VOIS Cardiovascular Risk Prediction API",
         "status": "online",
-        "model": "RandomForestClassifier",
+        "model": "XGBClassifier",
         "model_version": MODEL_VERSION,
         "docs": "/docs",
     }
@@ -72,12 +75,12 @@ def health():
     if model is None:
         raise HTTPException(
             status_code=503,
-            detail="Model artifact missing. Run python train_model.py in the Python 3.10 environment."
+            detail="Model artifact missing: Cardiovascular_Risk_Prediction_Classification.pkl."
         )
     return {
         "status": "healthy",
         "model_loaded": True,
-        "model": "RandomForestClassifier",
+        "model": "XGBClassifier",
         "model_version": MODEL_VERSION,
         "features": RAW_FEATURES,
     }
@@ -85,11 +88,14 @@ def health():
 @app.post("/predict")
 def predict(payload: PredictionInput):
     if model is None:
-        raise HTTPException(status_code=503, detail="Model artifact not found. Run python train_model.py.")
+        raise HTTPException(status_code=503, detail="Model artifact not found.")
     try:
         row = pd.DataFrame([payload.model_dump()])
-        prediction = int(model.predict(row)[0])
-        probabilities = model.predict_proba(row)[0]
+        if pkl_preprocessor is None:
+            raise HTTPException(status_code=503, detail="Model preprocessor not initialized.")
+        model_input = pkl_preprocessor.transform(row)
+        prediction = int(model.predict(model_input)[0])
+        probabilities = model.predict_proba(model_input)[0]
         classes = list(model.classes_)
         p0 = float(probabilities[classes.index(0)])
         p1 = float(probabilities[classes.index(1)])
@@ -100,7 +106,7 @@ def predict(payload: PredictionInput):
             "probability_class_0": round(p0, 6),
             "probability_class_1": round(p1, 6),
             "threshold": 0.5,
-            "model": "RandomForestClassifier",
+            "model": "XGBClassifier",
             "model_version": MODEL_VERSION,
             "disclaimer": DISCLAIMER,
         }

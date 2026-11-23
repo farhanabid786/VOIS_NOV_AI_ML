@@ -3,13 +3,13 @@ from main import app
 
 client = TestClient(app)
 
-def test_health_reports_loaded_random_forest():
+def test_health_reports_loaded_xgboost():
     response = client.get("/health")
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "healthy"
     assert body["model_loaded"] is True
-    assert body["model"] == "RandomForestClassifier"
+    assert body["model"] == "XGBClassifier"
 
 def test_prediction_contract():
     payload = {
@@ -21,7 +21,7 @@ def test_prediction_contract():
     response = client.post("/predict", json=payload)
     assert response.status_code == 200
     body = response.json()
-    assert body["model"] == "RandomForestClassifier"
+    assert body["model"] == "XGBClassifier"
     assert body["prediction"] in (0, 1)
     assert 0 <= body["probability_class_1"] <= 1
     assert 0 <= body["probability_class_0"] <= 1

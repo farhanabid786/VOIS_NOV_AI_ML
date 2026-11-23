@@ -19,12 +19,12 @@ Write-Host "Installing pinned backend dependencies..."
 & $venvPython -m pip install -r (Join-Path $backend "requirements.txt")
 if ($LASTEXITCODE -ne 0) { throw "Backend dependency installation failed." }
 
-Write-Host "Training Random Forest from the supplied CSV..."
+Write-Host "Verifying the uploaded XGBoost notebook PKL..."
+$modelPath = Join-Path $backend "models\Cardiovascular_Risk_Prediction_Classification.pkl"
+if (-not (Test-Path $modelPath)) { throw "Notebook PKL model artifact was not found." }
+
 Push-Location $backend
 try {
-    & $venvPython train_model.py
-    if ($LASTEXITCODE -ne 0) { throw "Model training failed." }
-
     Write-Host "Installing test dependencies..."
     & $venvPython -m pip install -r requirements-dev.txt
     if ($LASTEXITCODE -ne 0) { throw "Test dependency installation failed." }

@@ -26,7 +26,7 @@ function App() {
   const [loading,setLoading] = useState(false)
   const [apiStatus,setApiStatus] = useState('Checking API…')
   useEffect(() => {
-    fetch(`${API}/health`).then(r => r.json()).then(d => setApiStatus(d.model_loaded ? 'API connected · Random Forest loaded' : 'API online · Model unavailable'))
+    fetch(`${API}/health`).then(r => r.json()).then(d => setApiStatus(d.model_loaded ? 'API connected · XGBoost loaded' : 'API online · Model unavailable'))
       .catch(() => setApiStatus('API not connected'))
   }, [])
   function change(key,value) { setForm(p => ({...p,[key]: key==='sex' ? value : Number(value)})) }
